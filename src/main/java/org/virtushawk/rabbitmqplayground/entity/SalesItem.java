@@ -1,10 +1,9 @@
 package org.virtushawk.rabbitmqplayground.entity;
 
-import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Lob;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
@@ -16,44 +15,22 @@ import java.math.BigDecimal;
 @Table(name = "SALES_ITEM")
 public class SalesItem extends BaseEntity {
 
-    @Column(name = "NAME", nullable = false)
-    private String name;
-
-    @Lob
-    @Column(name = "DESCRIPTION")
-    @Basic(fetch = FetchType.LAZY)
-    private String description;
-
-    @Lob
-    @Column(name = "PICTURE")
-    @Basic(fetch = FetchType.LAZY)
-    private String picture;
+    @Column(name = "TITLE", nullable = false)
+    private String title;
 
     @Column(name = "PRICE", nullable = false, precision = 19, scale = 4)
     private BigDecimal price;
 
-    public String getName() {
-        return name;
+    @ManyToOne
+    @JoinColumn(name = "UUID", nullable = false, insertable = false, updatable = false)
+    private Receipt receipt;
+
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public BigDecimal getPrice() {
@@ -62,5 +39,13 @@ public class SalesItem extends BaseEntity {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public Receipt getReceipt() {
+        return receipt;
+    }
+
+    public void setReceipt(Receipt receipt) {
+        this.receipt = receipt;
     }
 }

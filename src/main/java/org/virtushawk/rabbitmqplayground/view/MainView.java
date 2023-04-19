@@ -1,6 +1,8 @@
 package org.virtushawk.rabbitmqplayground.view;
 
 import com.vaadin.flow.component.AbstractField;
+import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
@@ -16,9 +18,16 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.mapstruct.factory.Mappers;
+import org.virtushawk.rabbitmqplayground.entity.Order;
+import org.virtushawk.rabbitmqplayground.entity.OrderStatus;
+import org.virtushawk.rabbitmqplayground.entity.view.OrderViewModel;
+import org.virtushawk.rabbitmqplayground.entity.view.ArticleViewModel;
+import org.virtushawk.rabbitmqplayground.entity.view.ReceiptViewModel;
 import org.virtushawk.rabbitmqplayground.entity.view.SalesItemViewModel;
-import org.virtushawk.rabbitmqplayground.mapper.SalesItemToSalesItemViewModelMapper;
-import org.virtushawk.rabbitmqplayground.service.SalesItemService;
+import org.virtushawk.rabbitmqplayground.mapper.OrderViewModelToOrderMapper;
+import org.virtushawk.rabbitmqplayground.mapper.ArticleToArticleViewModelMapper;
+import org.virtushawk.rabbitmqplayground.service.OrderService;
+import org.virtushawk.rabbitmqplayground.service.ArticleService;
 
 import java.util.List;
 
@@ -26,18 +35,24 @@ import java.util.List;
 @PageTitle("Buy item")
 public class MainView extends VerticalLayout {
 
-    private final transient SalesItemService salesItemService;
-    private final transient SalesItemToSalesItemViewModelMapper salesItemToSalesItemViewModelMapper;
+    private final transient ArticleService articleService;
 
-    private final ListBox<SalesItemViewModel> salesItemViewModelListBox;
+    private final transient OrderService orderService;
+    private final transient ArticleToArticleViewModelMapper articleToArticleViewModelMapper;
+
+    private final transient OrderViewModelToOrderMapper orderViewModelToOrderMapper;
+
+    private final ListBox<ArticleViewModel> salesItemViewModelListBox;
 
     private final EmailField emailField;
 
     private final Button orderButton;
 
-    public MainView(SalesItemService salesItemService) {
-        this.salesItemService = salesItemService;
-        this.salesItemToSalesItemViewModelMapper = Mappers.getMapper(SalesItemToSalesItemViewModelMapper.class);
+    public MainView(ArticleService articleService, OrderService orderService) {
+        this.articleService = articleService;
+        this.orderService = orderService;
+        this.articleToArticleViewModelMapper = Mappers.getMapper(ArticleToArticleViewModelMapper.class);
+        this.orderViewModelToOrderMapper = Mappers.getMapper(OrderViewModelToOrderMapper.class);
 
         this.salesItemViewModelListBox = createSalesItemListBox();
         this.emailField = createEmailField();
@@ -48,8 +63,8 @@ public class MainView extends VerticalLayout {
         add(salesItemViewModelListBox, emailField, orderButton);
     }
 
-    private List<SalesItemViewModel> getSalesItemModels() {
-        return salesItemToSalesItemViewModelMapper.mapToListDTO(salesItemService.findAll());
+    private List<ArticleViewModel> getSalesItemModels() {
+        return articleToArticleViewModelMapper.mapToListDTO(articleService.findAll());
     }
 
     private void configureView() {
@@ -58,8 +73,8 @@ public class MainView extends VerticalLayout {
         setAlignItems(Alignment.CENTER);
     }
 
-    private ListBox<SalesItemViewModel> createSalesItemListBox() {
-        ListBox<SalesItemViewModel> bookList = new ListBox<>();
+    private ListBox<ArticleViewModel> createSalesItemListBox() {
+        ListBox<ArticleViewModel> bookList = new ListBox<>();
         bookList.setItems(getSalesItemModels());
 
         bookList.setRenderer(new ComponentRenderer<>(salesItem -> {
@@ -67,10 +82,10 @@ public class MainView extends VerticalLayout {
             row.setAlignItems(FlexComponent.Alignment.CENTER);
 
             Avatar avatar = new Avatar();
-            avatar.setName(salesItem.getName());
+            avatar.setName(salesItem.getTitle());
             avatar.setImage(salesItem.getPicture());
 
-            Span name = new Span(salesItem.getName());
+            Span name = new Span(salesItem.getTitle());
             Span description = new Span(salesItem.getDescription());
             Span price = new Span(String.valueOf(salesItem.getPrice()));
             description.getStyle()
@@ -86,7 +101,7 @@ public class MainView extends VerticalLayout {
             return row;
         }));
 
-        bookList.addValueChangeListener((HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<ListBox<SalesItemViewModel>, SalesItemViewModel>>) event -> {
+        bookList.addValueChangeListener((HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<ListBox<ArticleViewModel>, ArticleViewModel>>) event -> {
             if (event.getValue() != null) {
                 emailField.setEnabled(true);
             }
@@ -117,8 +132,28 @@ public class MainView extends VerticalLayout {
         Button button = new Button("Order");
         button.addThemeVariants(ButtonVariant.LUMO_LARGE);
         button.setEnabled(false);
+        button.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
+           ArticleViewModel salesItem = salesItemViewModelListBox.getValue();
+           String emailAddress = emailField.getValue();
+
+            SalesItemViewModel salesItemViewModel = new SalesItemViewModel();
+            salesItemViewModel.setPrice(salesItem.getPrice());
+            salesItemViewModel.setTitle(salesItem.getTitle());
+
+            ReceiptViewModel receipt = new ReceiptViewModel();
+            receipt.setSalesItems(List.of(salesItemViewModel));
+            receipt.setTotalPrice(salesItemViewModel.getPrice());
+
+            OrderViewModel orderView = new OrderViewModel();
+            orderView.setReceipt(receipt);
+            orderView.setEmail(emailAddress);
+            orderView.setStatus(OrderStatus.NEW);
+
+            Order order = orderViewModelToOrderMapper.mapToEntity(orderView);
+
+            orderService.processOrder(order);
+        });
         return button;
     }
-
 
 }

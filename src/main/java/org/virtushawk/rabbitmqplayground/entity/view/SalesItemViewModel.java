@@ -4,38 +4,24 @@ import org.virtushawk.rabbitmqplayground.entity.BaseDTO;
 
 import java.math.BigDecimal;
 
+
 /**
- * Represents sales item object on UI
+ * Represents sales item on UI
  */
 public class SalesItemViewModel extends BaseDTO {
 
-    private String name;
-    private String description;
-    private String picture;
+    private String title;
+
     private BigDecimal price;
 
-    public String getName() {
-        return name;
+    private ReceiptViewModel receipt;
+
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public BigDecimal getPrice() {
@@ -44,5 +30,13 @@ public class SalesItemViewModel extends BaseDTO {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public ReceiptViewModel getReceipt() {
+        return receipt;
+    }
+
+    public void setReceipt(ReceiptViewModel receipt) {
+        this.receipt = receipt;
     }
 }

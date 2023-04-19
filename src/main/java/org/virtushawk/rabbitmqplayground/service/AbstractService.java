@@ -18,4 +18,11 @@ public interface AbstractService <T extends BaseEntity> {
      */
     List<T> findAll();
 
+    /**
+     * Create entity
+     *
+     * @return managed entity
+     */
+    T create(T entity);
+
 }

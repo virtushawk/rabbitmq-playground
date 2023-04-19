@@ -1,2 +1,2 @@
-INSERT INTO SALES_ITEM (UUID,NAME,DESCRIPTION,PICTURE,PRICE) VALUES (UUID(),'Book 1', 'Great book', 'https://easydrawingguides.com/wp-content/uploads/2020/10/how-to-draw-an-open-book-featured-image-1200.png', '2.00');
-INSERT INTO SALES_ITEM (UUID,NAME,DESCRIPTION,PICTURE,PRICE) VALUES (UUID(),'Book 2', 'Not so great book', 'https://easydrawingguides.com/wp-content/uploads/2020/10/how-to-draw-an-open-book-featured-image-1200.png', '1.00');
+INSERT INTO ARTICLE (UUID,TITLE,DESCRIPTION,PICTURE,PRICE) VALUES (UUID(),'Book 1', 'Great book', 'https://easydrawingguides.com/wp-content/uploads/2020/10/how-to-draw-an-open-book-featured-image-1200.png', '2.00');
+INSERT INTO ARTICLE (UUID,TITLE,DESCRIPTION,PICTURE,PRICE) VALUES (UUID(),'Book 2', 'Not so great book', 'https://easydrawingguides.com/wp-content/uploads/2020/10/how-to-draw-an-open-book-featured-image-1200.png', '1.00');

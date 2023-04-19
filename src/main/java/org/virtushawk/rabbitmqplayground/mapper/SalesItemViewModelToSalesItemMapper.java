@@ -3,12 +3,12 @@ package org.virtushawk.rabbitmqplayground.mapper;
 import org.mapstruct.Mapper;
 import org.virtushawk.rabbitmqplayground.entity.SalesItem;
 import org.virtushawk.rabbitmqplayground.entity.view.SalesItemViewModel;
-import org.virtushawk.rabbitmqplayground.mapper.common.EntityToDTOMapper;
+import org.virtushawk.rabbitmqplayground.mapper.common.DTOToEntityMapper;
 import org.virtushawk.rabbitmqplayground.mapper.common.MapperConfiguration;
 
 /**
- * Map {@link SalesItem} to {@link SalesItemViewModel}
+ *  Map {@link SalesItemViewModel} to {@link SalesItem}
  */
 @Mapper(config = MapperConfiguration.class)
-public interface SalesItemToSalesItemViewModelMapper extends EntityToDTOMapper<SalesItem, SalesItemViewModel> {
+public interface SalesItemViewModelToSalesItemMapper extends DTOToEntityMapper<SalesItemViewModel, SalesItem> {
 }
