@@ -136,11 +136,11 @@ public class MainView extends VerticalLayout {
            ArticleViewModel salesItem = salesItemViewModelListBox.getValue();
            String emailAddress = emailField.getValue();
 
+            ReceiptViewModel receipt = new ReceiptViewModel();
             SalesItemViewModel salesItemViewModel = new SalesItemViewModel();
             salesItemViewModel.setPrice(salesItem.getPrice());
             salesItemViewModel.setTitle(salesItem.getTitle());
 
-            ReceiptViewModel receipt = new ReceiptViewModel();
             receipt.setSalesItems(List.of(salesItemViewModel));
             receipt.setTotalPrice(salesItemViewModel.getPrice());
 

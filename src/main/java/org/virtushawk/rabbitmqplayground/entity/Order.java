@@ -1,5 +1,6 @@
 package org.virtushawk.rabbitmqplayground.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,7 +16,7 @@ import jakarta.persistence.Table;
 @Table(name = "ORDER_ENTITY")
 public class Order extends BaseWithAuditingFieldsEntity {
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @MapsId
     private Receipt receipt;
 

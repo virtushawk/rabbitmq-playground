@@ -21,8 +21,24 @@ public interface AbstractService <T extends BaseEntity> {
     /**
      * Create entity
      *
+     * @param entity the entity
      * @return managed entity
      */
     T create(T entity);
+
+    /**
+     * Delete entity
+     *
+     * @param entity the entity
+     */
+    void delete(T entity);
+
+    /**
+     * Update entity
+     *
+     * @param entity the entity
+     * @return updated entity
+     */
+    T update(T entity);
 
 }

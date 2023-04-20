@@ -3,10 +3,13 @@ package org.virtushawk.rabbitmqplayground.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,11 +19,12 @@ import java.util.List;
 @Table(name = "RECEIPT")
 public class Receipt extends BaseEntity {
 
-    @OneToMany(mappedBy = "receipt", cascade = CascadeType.ALL)
-    private List<SalesItem> salesItems;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "RECEIPT_UUID")
+    private List<SalesItem> salesItems = new ArrayList<>();
 
     @Column(name = "TOTAL_PRICE", nullable = false, precision = 19, scale = 4)
-    private BigDecimal totalPrice;
+    private BigDecimal totalPrice = BigDecimal.ZERO;
 
     public List<SalesItem> getSalesItems() {
         return salesItems;

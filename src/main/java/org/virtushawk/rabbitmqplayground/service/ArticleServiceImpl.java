@@ -27,4 +27,14 @@ public class ArticleServiceImpl implements ArticleService {
     public Article create(Article entity) {
         return articleDAO.save(entity);
     }
+
+    @Override
+    public void delete(Article entity) {
+        articleDAO.delete(entity);
+    }
+
+    @Override
+    public Article update(Article entity) {
+        return articleDAO.save(entity);
+    }
 }

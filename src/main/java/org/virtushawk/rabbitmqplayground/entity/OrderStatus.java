@@ -15,9 +15,9 @@ public enum OrderStatus {
     IN_PROGRESS,
 
     /**
-     * Order is cancelled
+     * Order was unsuccessful
      */
-    CANCELLED,
+    FAILED,
 
     /**
      * Order is archived
