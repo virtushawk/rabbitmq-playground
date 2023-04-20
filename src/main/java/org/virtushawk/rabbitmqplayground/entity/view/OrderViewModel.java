@@ -9,9 +9,7 @@ import org.virtushawk.rabbitmqplayground.entity.OrderStatus;
 public class OrderViewModel extends BaseWithAuditingFieldsDTO {
 
     private ReceiptViewModel receipt;
-
     private OrderStatus status;
-
     private String email;
 
     public OrderStatus getStatus() {

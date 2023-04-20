@@ -11,7 +11,6 @@ import java.util.List;
 public class ReceiptViewModel extends BaseDTO {
 
     private List<SalesItemViewModel> salesItems;
-
     private BigDecimal totalPrice;
 
     public List<SalesItemViewModel> getSalesItems() {

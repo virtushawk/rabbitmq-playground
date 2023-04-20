@@ -11,10 +11,7 @@ import java.math.BigDecimal;
 public class SalesItemViewModel extends BaseDTO {
 
     private String title;
-
     private BigDecimal price;
-
-    private ReceiptViewModel receipt;
 
     public String getTitle() {
         return title;
@@ -30,13 +27,5 @@ public class SalesItemViewModel extends BaseDTO {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
-    }
-
-    public ReceiptViewModel getReceipt() {
-        return receipt;
-    }
-
-    public void setReceipt(ReceiptViewModel receipt) {
-        this.receipt = receipt;
     }
 }
