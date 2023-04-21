@@ -1,6 +1,11 @@
 package org.virtushawk.rabbitmqplayground.config;
 
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -16,9 +21,11 @@ public class JMSConfiguration {
 
     public static final String SIMPLE_EXCHANGE = "simple-exchange";
 
-    public static final String DEAD_LETTER_EXCHANGE = "dead-letter-exchange";
+    public static final String FAILED_LETTER_EXCHANGE = "failed-letter-exchange";
 
     public static final String WAIT_LETTER_EXCHANGE = "wait-letter-exchange";
+
+    public static final String DEAD_LETTER_EXCHANGE = "dead-letter-exchange";
 
     public static final String PROCESS_ORDER_QUEUE = "q.process-order";
 
@@ -28,6 +35,8 @@ public class JMSConfiguration {
 
     public static final String WAIT_PROCESS_ORDER_QUEUE = "q.wait-process-order";
 
+    public static final String DEAD_PROCESS_ORDER_QUEUE = "q.dead-process-order-queue";
+
     public static final String PROCESS_ORDER_ROUTING_KEY = "process.order";
 
     public static final String FALL_BACK_ROUTING_KEY = "fall-back";
@@ -35,6 +44,12 @@ public class JMSConfiguration {
     public static final String RETRY_PROCESS_ORDER_ROUTING_KEY = "retry.process.order";
 
     public static final String WAIT_PROCESS_ORDER_ROUTING_KEY = "wait.process.order";
+
+    public static final String DEAD_PROCESS_ORDER_ROUTING_KEY = "dead.process.order";
+
+    public static final int DEFAULT_TTL = 10000;
+
+    public static final int DEFAULT_MAX_LENGTH = 2;
 
     private final CachingConnectionFactory cachingConnectionFactory;
 
@@ -44,12 +59,22 @@ public class JMSConfiguration {
 
     @Bean
     Queue queue() {
-        return new Queue(PROCESS_ORDER_QUEUE, true);
+        return QueueBuilder.durable(PROCESS_ORDER_QUEUE)
+                .deadLetterExchange(DEAD_LETTER_EXCHANGE)
+                .deadLetterRoutingKey(DEAD_PROCESS_ORDER_ROUTING_KEY)
+                .ttl(DEFAULT_TTL)
+                .maxLength(DEFAULT_MAX_LENGTH)
+                .build();
     }
 
     @Bean
     Queue retryQueue() {
-        return new Queue(RETRY_ORDER_QUEUE, true);
+        return QueueBuilder.durable(RETRY_ORDER_QUEUE)
+                .deadLetterExchange(DEAD_LETTER_EXCHANGE)
+                .deadLetterRoutingKey(DEAD_PROCESS_ORDER_ROUTING_KEY)
+                .ttl(DEFAULT_TTL)
+                .maxLength(DEFAULT_MAX_LENGTH)
+                .build();
     }
 
     @Bean
@@ -64,6 +89,11 @@ public class JMSConfiguration {
                 .deadLetterRoutingKey(PROCESS_ORDER_ROUTING_KEY)
                 .ttl(1000)
                 .build();
+    }
+
+    @Bean
+    Queue deadLetterQueue() {
+        return new Queue(DEAD_PROCESS_ORDER_QUEUE, true);
     }
 
     @Bean
@@ -87,18 +117,28 @@ public class JMSConfiguration {
     }
 
     @Bean
+    Binding deadQueueBinding() {
+        return BindingBuilder.bind(deadLetterQueue()).to(deadLetterExchange()).with(DEAD_PROCESS_ORDER_ROUTING_KEY);
+    }
+
+    @Bean
     public TopicExchange topicExchange() {
         return new TopicExchange(SIMPLE_EXCHANGE);
     }
 
     @Bean
     public DirectExchange directExchange() {
-        return new DirectExchange(DEAD_LETTER_EXCHANGE);
+        return new DirectExchange(FAILED_LETTER_EXCHANGE);
     }
 
     @Bean
     public DirectExchange waitExchange() {
         return new DirectExchange(WAIT_LETTER_EXCHANGE);
+    }
+
+    @Bean
+    public DirectExchange deadLetterExchange() {
+        return new DirectExchange(DEAD_LETTER_EXCHANGE);
     }
 
     @Bean
@@ -113,7 +153,7 @@ public class JMSConfiguration {
         return RetryInterceptorBuilder.stateless()
                 .maxAttempts(1)
                 .recoverer(new RepublishMessageMaxAttempts(rabbitTemplate(), WAIT_LETTER_EXCHANGE,
-                        WAIT_PROCESS_ORDER_ROUTING_KEY, DEAD_LETTER_EXCHANGE, FALL_BACK_ROUTING_KEY, 2))
+                        WAIT_PROCESS_ORDER_ROUTING_KEY, FAILED_LETTER_EXCHANGE, FALL_BACK_ROUTING_KEY, 2))
                 .build();
     }
 
